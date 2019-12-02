@@ -94,7 +94,7 @@ module.exports = function (qiniu, option) {
 
     isConcurrent && next()
   }, function () {
-    Q.all(qs)
+    return Q.all(qs)
       .then(function (rets) {
         log('Total →', colors.green(uploadedFiles + '/' + rets.length));
 
