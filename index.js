@@ -93,21 +93,27 @@ module.exports = function (qiniu, option) {
     qs.push(handler())
 
     isConcurrent && next()
-  }, function () {
-    return Q.all(qs)
+  }, function (next) {
+    Q.all(qs)
       .then(function (rets) {
         log('Total →', colors.green(uploadedFiles + '/' + rets.length));
 
         // Check if versioning
-        if (!option.versioning) return;
+        if (!option.versioning) {
+          next();
+          return;
+        }
         log('Version →', colors.green(version));
 
         if (option.versionFile) {
           fs.writeFileSync(option.versionFile, JSON.stringify({version: version}))
           log('Write version file →', colors.green(option.versionFile));
         }
+
+        next();
       }, function (err) {
         log('Failed upload →', err.message);
+        throw err;
       });
   });
 
